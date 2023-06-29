@@ -1,0 +1,12 @@
+.toolbarFooterContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-area: toolbar;
+  background-color: #eee;
+}
+
+.slider {
+  margin-left: 16px;
+  margin-right: 16px;
+}
