@@ -1,14 +1,14 @@
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import styles from './pdftoolbarfooter.module.css';
+import toolStyles from './pdftoolbarfooter.module.css';
 import { IconButton } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
-const zoomMult = 0.1;
+const zoomMult = 0.25;
 
-export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, pageScale, setPageScale, isFullscreen }) {
+export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, pageScale, setPageScale, isFullscreen, realignTransform }) {
   function reqFullscreen() {
     if (!isFullscreen) {
       document.body.requestFullscreen();
@@ -23,14 +23,16 @@ export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, 
 
   function zoomIn() {
     setPageScale(pageScale+zoomMult);
+    realignTransform();
   }
 
   function zoomOut() {
     setPageScale(pageScale-zoomMult);
+    realignTransform();
   }
 
   return (
-    <div className={`${styles.toolbarFooterContainer}`}>
+    <div className={`${toolStyles.toolbarFooterContainer}`}>
       <span>
         {pageNumber}&nbsp;/&nbsp;{numPages}
       </span>
@@ -41,7 +43,7 @@ export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, 
         step={2}
         defaultValue={2}
         onChange={handleSlider}
-        className={styles.slider}
+        className={toolStyles.slider}
       />
 
       <IconButton onClick={zoomOut} >
