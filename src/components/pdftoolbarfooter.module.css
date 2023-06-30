@@ -1,8 +1,17 @@
 .toolbarFooterContainer {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+
+  height: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
-  grid-area: toolbar;
   background-color: #eee;
 }
 
@@ -10,3 +19,8 @@
   margin-left: 16px;
   margin-right: 16px;
 }
+
+.arrow {
+  color: #eee !important;
+}
+
