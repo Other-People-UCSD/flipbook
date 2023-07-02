@@ -7,7 +7,7 @@ import toolStyles from './pdftoolbarfooter.module.css';
 import '../styles/global.css';
 
 import PdfToolbarFooter from "./PdfToolbarFooter";
-import samplePDF from '../pdf/EclipseWeb-compressed.pdf';
+import samplePDF from '../pdf/EclipseFinalSpread-compressed.pdf';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -23,10 +23,11 @@ export default function Pdf() {
   const [pageScale, setPageScale] = useState(1.0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef(null);
+  const overlayRef = useRef(null);
+  const canvasRef = useRef(null);
   const transformComponentRef = useRef(null);
 
   useEffect(() => {
-
     function onFullscreenChange() {
       console.log('fullscreen')
       setIsFullscreen(Boolean(document.fullscreenElement))
@@ -41,40 +42,45 @@ export default function Pdf() {
   }, []);
 
   const hidePageCanvas = useCallback(() => {
-    const canvas = containerRef.current.querySelectorAll('canvas');
-    console.log(canvas[0])
-    if (canvas) {
-      canvas[0].style.visibility = 'hidden';
-      if (canvas[1])
-        canvas[1].style.visibility = 'hidden';
-    }
+    const ctx = overlayRef.current.getContext('2d');
+    ctx.filter = "blur(1px)";
+    ctx.drawImage(overlayRef.current, 0, 0)
   }, [containerRef]);
 
   const showPageCanvas = useCallback(() => {
-    const canvas = containerRef.current.querySelectorAll('canvas');
-    if (canvas) {
-      canvas[0].style.visibility = 'hidden';
-      if (canvas[1])
-        canvas[1].style.visibility = 'hidden';
-    }
+    console.log(canvasRef.current, overlayRef.current)
+
+    const ctx = overlayRef.current.getContext('2d');
+    overlayRef.current.width = canvasRef.current.width;
+    overlayRef.current.height = canvasRef.current.height;
+
+    ctx.drawImage(canvasRef.current, 0, 0);
+
+    const oldCtx = canvasRef.current.getContext('2d');
+    const imgData = oldCtx.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
+    ctx.putImageData(imgData, 0, 0)
+
   }, [containerRef]);
 
   const onPageLoadSuccess = useCallback(() => {
+    console.log('loadsuccess');
     hidePageCanvas();
   }, [hidePageCanvas]);
 
   const onPageRenderSuccess = useCallback(() => {
     showPageCanvas();
+
   }, [showPageCanvas]);
 
   const onPageRenderError = useCallback(() => {
+    console.log('rendererror')
     showPageCanvas();
   }, [showPageCanvas]);
 
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
-    setPageNumber(2);
+    setPageNumber(1);
   }
 
   function realignTransform() {
@@ -83,6 +89,23 @@ export default function Pdf() {
     console.log(transformComponentRef.current.centerView)
     setTransform(0, 0, 1, 0);
     centerView(1, 100)
+  }
+
+  const handlePrevPage = () => {
+    const newPageNum = pageNumber - 1;
+    if (newPageNum <= 0) {
+      setPageNumber(numPages)
+    } else {
+      setPageNumber(newPageNum)
+    }
+  }
+  const handleNextPage = () => {
+    const newPageNum = pageNumber + 1;
+    if (newPageNum > numPages) {
+      setPageNumber(1)
+    } else {
+      setPageNumber(newPageNum)
+    }
   }
 
 
@@ -104,10 +127,10 @@ export default function Pdf() {
         ref={transformComponentRef}
       >
         <TransformComponent
-        wrapperStyle={{
-          width: '100%',
-          height: '100%',
-        }}
+          wrapperStyle={{
+            width: '100%',
+            height: '100%',
+          }}
           contentStyle={{
             width: '100%',
             height: 'fit-content'
@@ -119,8 +142,12 @@ export default function Pdf() {
             onLoadSuccess={onDocumentLoadSuccess}
             className={pdfStyles.pdfContainer}
           >
-
+            <canvas
+              id='docOverlay'
+              ref={overlayRef}
+              className={pdfStyles.docOverlay} />
             <Page
+              canvasRef={canvasRef}
               pageNumber={leftPage}
               renderTextLayer={false}
               renderAnnotationLayer={false}
@@ -132,18 +159,6 @@ export default function Pdf() {
               onRenderSuccess={onPageRenderSuccess}
               onRenderError={onPageRenderError}
             />
-            {rightPage !== 0 ? (
-              <Page pageNumber={rightPage}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                loading={false}
-                scale={pageScale}
-                className={`${pdfStyles["fade-in"]} ${pdfStyles.rightPage}`}
-                onLoadSuccess={onPageLoadSuccess}
-                onRenderSuccess={onPageRenderSuccess}
-                onRenderError={onPageRenderError}
-              />
-            ) : <div></div>}
           </Document>
         </TransformComponent>
       </TransformWrapper>
@@ -154,7 +169,7 @@ export default function Pdf() {
 
       <IconButton
         className={`${toolStyles.leftArrow} ${toolStyles.arrow}`}
-        onClick={() => setPageNumber(pageNumber - 2)}
+        onClick={handlePrevPage}
         sx={{
           borderRadius: 0,
           position: 'absolute',
@@ -168,7 +183,7 @@ export default function Pdf() {
 
       <IconButton
         className={`${toolStyles.rightArrow} ${toolStyles.arrow}`}
-        onClick={() => setPageNumber(pageNumber + 2)}
+        onClick={handleNextPage}
         sx={{
           borderRadius: 0,
           position: 'absolute',
