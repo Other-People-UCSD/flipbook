@@ -41,7 +41,7 @@ export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, 
         min={0}
         max={numPages}
         step={2}
-        defaultValue={1}
+        defaultValue={pageNumber}
         value={pageNumber}
         onChange={handleSlider}
         className={toolStyles.slider}

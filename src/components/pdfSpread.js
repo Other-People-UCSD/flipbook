@@ -7,7 +7,7 @@ import toolStyles from './pdftoolbarfooter.module.css';
 import '../styles/global.css';
 
 import PdfToolbarFooter from "./PdfToolbarFooter";
-import samplePDF from '../pdf/EclipseWeb-compressed.pdf';
+import samplePDF from '../pdf/EclipseFinalSpread-compressed.pdf';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -17,16 +17,15 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 
-export default function Pdf() {
-  const pageOffset = 2;
+export default function SpreadPdf() {
+  const pageOffset = 1;
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageScale, setPageScale] = useState(1.0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef(null);
   const overlayRef = useRef(null);
-  const canvasLeftRef = useRef(null);
-  const canvasRightRef = useRef(null);
+  const canvasRef = useRef(null);
   const transformComponentRef = useRef(null);
 
   useEffect(() => {
@@ -50,23 +49,17 @@ export default function Pdf() {
   }, [containerRef]);
 
   const showPageCanvas = useCallback(() => {
-    const oldLeft = canvasLeftRef.current;
-    const oldRight = canvasRightRef.current;
+    console.log(canvasRef.current, overlayRef.current)
 
     const ctx = overlayRef.current.getContext('2d');
-    overlayRef.current.width = oldLeft.width + oldRight.width;
-    overlayRef.current.height = oldLeft.height + oldRight.height;
+    overlayRef.current.width = canvasRef.current.width;
+    overlayRef.current.height = canvasRef.current.height;
 
-    ctx.drawImage(oldLeft, 0, 0);
+    ctx.drawImage(canvasRef.current, 0, 0);
 
-    const oldCtxLeft = oldLeft.getContext('2d');
-    const imgDataLeft = oldCtxLeft.getImageData(0, 0, oldLeft.width, oldLeft.height);
-
-    const oldCtxRight = oldRight.getContext('2d');
-    const imgDataRight = oldCtxRight.getImageData(0, 0, oldRight.width, oldRight.height);
-
-    ctx.putImageData(imgDataLeft, 0, 0);
-    ctx.putImageData(imgDataRight, oldLeft.width, 0);
+    const oldCtx = canvasRef.current.getContext('2d');
+    const imgData = oldCtx.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
+    ctx.putImageData(imgData, 0, 0)
 
   }, [containerRef]);
 
@@ -88,7 +81,7 @@ export default function Pdf() {
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
-    setPageNumber(2);
+    setPageNumber(1);
   }
 
   function realignTransform() {
@@ -110,7 +103,7 @@ export default function Pdf() {
   const handleNextPage = () => {
     const newPageNum = pageNumber + pageOffset;
     if (newPageNum > numPages) {
-      setPageNumber(2)
+      setPageNumber(1)
     } else {
       setPageNumber(newPageNum)
     }
@@ -148,42 +141,32 @@ export default function Pdf() {
             inputRef={containerRef}
             file={samplePDF}
             onLoadSuccess={onDocumentLoadSuccess}
-            className={`${pdfStyles.pdfContainer} ${pdfStyles.singleLayout}`}
+            className={`${pdfStyles.pdfContainer} ${pdfStyles.spreadLayout}`}
           >
             <canvas
               id='docOverlay'
               ref={overlayRef}
               className={pdfStyles.docOverlay} />
             <Page
-              canvasRef={canvasLeftRef}
+              canvasRef={canvasRef}
               pageNumber={leftPage}
               renderTextLayer={false}
               renderAnnotationLayer={false}
               loading={false}
               scale={pageScale}
-              className={`${pdfStyles["fade-in"]} ${pdfStyles.leftPage}`}
+              className={`${pdfStyles["fade-in"]}`}
               devicePixelRatio={Math.min(2, window.devicePixelRatio)}
-              // onLoadSuccess={onPageLoadSuccess}
-              // onRenderSuccess={onPageRenderSuccess}
+              onLoadSuccess={onPageLoadSuccess}
+              onRenderSuccess={onPageRenderSuccess}
               onRenderError={onPageRenderError}
             />
-            {rightPage !== 0 ? (
-              <Page
-                canvasRef={canvasRightRef} 
-                pageNumber={rightPage}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                loading={false}
-                scale={pageScale}
-                className={`${pdfStyles["fade-in"]} ${pdfStyles.rightPage}`}
-                onLoadSuccess={onPageLoadSuccess}
-                onRenderSuccess={onPageRenderSuccess}
-                onRenderError={onPageRenderError}
-              />
-            ) : <div></div>}
           </Document>
         </TransformComponent>
       </TransformWrapper>
+
+
+
+
 
       <IconButton
         className={`${toolStyles.leftArrow} ${toolStyles.arrow}`}

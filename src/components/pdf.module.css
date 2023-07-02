@@ -1,14 +1,15 @@
 .pdfContainer {
   display: grid;
   box-sizing: border-box;
-  /* grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto;
-  grid-template-areas: "left right"; */
   margin-left: auto;
   margin-right: auto;
   width: fit-content;
+}
 
-
+.singleLayout {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  grid-template-areas: "left right";
 }
 
 .leftPage {
