@@ -22,12 +22,12 @@ export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, 
   }
 
   function zoomIn() {
-    setPageScale(pageScale+zoomMult);
+    setPageScale(pageScale + zoomMult);
     realignTransform();
   }
 
   function zoomOut() {
-    setPageScale(pageScale-zoomMult);
+    setPageScale(pageScale - zoomMult);
     realignTransform();
   }
 
@@ -41,7 +41,8 @@ export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, 
         min={0}
         max={numPages}
         step={2}
-        defaultValue={2}
+        defaultValue={pageNumber}
+        value={pageNumber}
         onChange={handleSlider}
         className={toolStyles.slider}
       />
