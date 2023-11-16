@@ -7,21 +7,22 @@ import toolStyles from './pdftoolbarfooter.module.css';
 import '../styles/global.css';
 
 import PdfToolbarFooter from "./PdfToolbarFooter";
-import samplePDF from '../pdf/EclipseWeb-compressed.pdf';
+// import samplePDF from '../pdf/EclipseWeb-compressed.pdf';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { IconButton } from '@mui/material';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { EmojiFlagsTwoTone } from '@mui/icons-material';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 
-export default function Pdf() {
+export default function Pdf({ pdfObject }) {
   const pageOffset = 2;
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageScale, setPageScale] = useState(1.0);
+  const [pageScale, setPageScale] = useState(0.8);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef(null);
   const overlayRef = useRef(null);
@@ -31,9 +32,7 @@ export default function Pdf() {
 
   useEffect(() => {
     function onFullscreenChange() {
-      console.log('fullscreen')
       setIsFullscreen(Boolean(document.fullscreenElement))
-      // setPageScale(1.4)
       realignTransform()
     }
 
@@ -47,31 +46,35 @@ export default function Pdf() {
     const ctx = overlayRef.current.getContext('2d');
     ctx.filter = "blur(1px)";
     ctx.drawImage(overlayRef.current, 0, 0)
-  }, [containerRef]);
+  }, []);
 
   const showPageCanvas = useCallback(() => {
     const oldLeft = canvasLeftRef.current;
     const oldRight = canvasRightRef.current;
-
     const ctx = overlayRef.current.getContext('2d');
-    overlayRef.current.width = oldLeft.width + oldRight.width;
-    overlayRef.current.height = oldLeft.height + oldRight.height;
 
     ctx.drawImage(oldLeft, 0, 0);
 
-    const oldCtxLeft = oldLeft.getContext('2d');
-    const imgDataLeft = oldCtxLeft.getImageData(0, 0, oldLeft.width, oldLeft.height);
+    const oldLeftW = oldLeft.width;
+    const oldLeftH = oldLeft.height;
+    const oldRightW = oldRight.width;
+    const oldRightH = oldRight.height;
 
-    const oldCtxRight = oldRight.getContext('2d');
-    const imgDataRight = oldCtxRight.getImageData(0, 0, oldRight.width, oldRight.height);
 
-    ctx.putImageData(imgDataLeft, 0, 0);
-    ctx.putImageData(imgDataRight, oldLeft.width, 0);
+    overlayRef.current.width = oldLeftW + oldRightW;
+    overlayRef.current.height = oldLeftH + oldRightH;
 
-  }, [containerRef]);
+    ctx.drawImage(oldLeft, 0, 0);
+    ctx.drawImage(oldRight, oldLeftW, 0);
+
+    oldLeft.style.width = 'inherit';
+    oldLeft.style.height = 'inherit';
+    oldRight.style.width = 'inherit';
+    oldRight.style.height = 'inherit';
+
+  }, []);
 
   const onPageLoadSuccess = useCallback(() => {
-    console.log('loadsuccess');
     hidePageCanvas();
   }, [hidePageCanvas]);
 
@@ -81,7 +84,6 @@ export default function Pdf() {
   }, [showPageCanvas]);
 
   const onPageRenderError = useCallback(() => {
-    console.log('rendererror')
     showPageCanvas();
   }, [showPageCanvas]);
 
@@ -131,7 +133,7 @@ export default function Pdf() {
         initialScale={1}
         minScale={1}
         maxScale={1}
-        onInit={realignTransform}
+        // onInit={realignTransform}
         ref={transformComponentRef}
       >
         <TransformComponent
@@ -146,7 +148,7 @@ export default function Pdf() {
         >
           <Document
             inputRef={containerRef}
-            file={samplePDF}
+            file={pdfObject}
             onLoadSuccess={onDocumentLoadSuccess}
             className={`${pdfStyles.pdfContainer} ${pdfStyles.singleLayout}`}
           >
@@ -163,13 +165,13 @@ export default function Pdf() {
               scale={pageScale}
               className={`${pdfStyles["fade-in"]} ${pdfStyles.leftPage}`}
               devicePixelRatio={Math.min(2, window.devicePixelRatio)}
-              // onLoadSuccess={onPageLoadSuccess}
-              // onRenderSuccess={onPageRenderSuccess}
+              onLoadSuccess={onPageLoadSuccess}
+              onRenderSuccess={onPageRenderSuccess}
               onRenderError={onPageRenderError}
             />
             {rightPage !== 0 ? (
               <Page
-                canvasRef={canvasRightRef} 
+                canvasRef={canvasRightRef}
                 pageNumber={rightPage}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}

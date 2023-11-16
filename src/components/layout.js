@@ -1,36 +1,52 @@
 import React, { useState } from "react";
-import Pdf from "./pdf.js";
 import '../styles/layout.css';
+import Pdf from "./pdf.js";
 import SpreadPdf from "./pdfSpread.js";
+
+import pdfObject from '../pdf/EclipseWeb-compressed.pdf';
+import pdf2 from '../pdf/refraction.pdf';
 
 export default function Layout() {
   const [isSingle, setIsSingle] = useState(true);
+  const [selectedPdf, setSelectedPdf] = useState(pdfObject);
 
   const displayPdfDemo = () => {
     setIsSingle(!isSingle);
   }
+
+  const handleSelect = (value) => {
+    switch (value) {
+      case ('eclipse'):
+        setSelectedPdf(pdfObject);
+        break;
+      case ('refraction'):
+        setSelectedPdf(pdf2);
+        break;
+    }
+  }
+
+
   return (
     <main className={'layoutContainer'}>
-      <button
-        onClick={displayPdfDemo}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          width: 'fit-content',
-          zIndex: 1
-        }}
-      >
-        {isSingle ? ("Single-paged pdf with spreads already made") : ("Single-paged pdf into double-page view")}
-      </button>
-      <p style={{ color: "white"}}>Unresolved: pdf shifting right on page change. Fixes itself after clicking a full cycle through the pdf.</p>
+      <div className={'top__info'}>
+        <button
+          onClick={displayPdfDemo}
+          className={'optnBtn'}
+        >
+          {isSingle ? ("Single-paged pdf with spreads already made") : ("Single-paged pdf into double-page view")}
+        </button>
+        <label htmlFor="selectPdf" />
+        <select id="selectPdf" name="selectPdf"
+          className={'optnBtn'}
+          onChange={(e) => handleSelect(e.currentTarget.value)}>
+          <option value="eclipse">Eclipse</option>
+          <option value="refraction">Refraction</option>
+        </select>
+      </div>
       {isSingle ?
-        (<Pdf />)
+        (<Pdf pdfObject={selectedPdf} />)
         :
-        (<SpreadPdf />)
+        (<SpreadPdf pdfObject={selectedPdf} />)
       }
     </main>
   );

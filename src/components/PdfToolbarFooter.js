@@ -6,7 +6,7 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
-const zoomMult = 0.25;
+const zoomMult = 0.1;
 
 export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, pageScale, setPageScale, isFullscreen, realignTransform }) {
   function reqFullscreen() {

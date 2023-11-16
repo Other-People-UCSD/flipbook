@@ -7,7 +7,7 @@ import toolStyles from './pdftoolbarfooter.module.css';
 import '../styles/global.css';
 
 import PdfToolbarFooter from "./PdfToolbarFooter";
-import samplePDF from '../pdf/EclipseFinalSpread-compressed.pdf';
+// import samplePDF from '../pdf/EclipseFinalSpread-compressed.pdf';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -17,7 +17,7 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 
-export default function SpreadPdf() {
+export default function SpreadPdf({ pdfObject }) {
   const pageOffset = 1;
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -46,7 +46,7 @@ export default function SpreadPdf() {
     const ctx = overlayRef.current.getContext('2d');
     ctx.filter = "blur(1px)";
     ctx.drawImage(overlayRef.current, 0, 0)
-  }, [containerRef]);
+  }, []);
 
   const showPageCanvas = useCallback(() => {
     console.log(canvasRef.current, overlayRef.current)
@@ -61,7 +61,7 @@ export default function SpreadPdf() {
     const imgData = oldCtx.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
     ctx.putImageData(imgData, 0, 0)
 
-  }, [containerRef]);
+  }, []);
 
   const onPageLoadSuccess = useCallback(() => {
     console.log('loadsuccess');
@@ -139,7 +139,7 @@ export default function SpreadPdf() {
         >
           <Document
             inputRef={containerRef}
-            file={samplePDF}
+            file={pdfObject}
             onLoadSuccess={onDocumentLoadSuccess}
             className={`${pdfStyles.pdfContainer} ${pdfStyles.spreadLayout}`}
           >
