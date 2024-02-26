@@ -1,13 +1,9 @@
 .toolbarFooterContainer {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-
+  display: block;
+  margin: 0;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  width: 96vw;
   height: 48px;
   display: flex;
   justify-content: center;
@@ -24,3 +20,6 @@
   color: #eee !important;
 }
 
+.zoom__input {
+  width: 40px;
+}

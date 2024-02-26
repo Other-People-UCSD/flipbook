@@ -19,7 +19,7 @@
 
 .rightPage {
   grid-area: right;
-  /* background-color: transparent !important; */
+  background-color: transparent !important;
 
 }
 

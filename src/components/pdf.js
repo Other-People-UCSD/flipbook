@@ -62,7 +62,7 @@ export default function Pdf({ pdfObject }) {
 
 
     overlayRef.current.width = oldLeftW + oldRightW;
-    overlayRef.current.height = oldLeftH + oldRightH;
+    overlayRef.current.height = Math.max(oldLeftH, oldRightH);
 
     ctx.drawImage(oldLeft, 0, 0);
     ctx.drawImage(oldRight, oldLeftW, 0);
@@ -118,32 +118,29 @@ export default function Pdf({ pdfObject }) {
     }
   }
 
-
   const leftPage = pageNumber <= numPages ? pageNumber : 1;
   const rightPage = pageNumber + 1 <= numPages ? pageNumber + 1 : 1;
-  console.log('pages:', leftPage, rightPage, numPages)
-
 
   return (
     <>
       <TransformWrapper
-        wheel={{ disabled: true }}
-        pinch={{ disabled: true }}
+        wheel={{ disabled: false }}
+        pinch={{ disabled: false }}
         doubleClick={{ disabled: true }}
         initialScale={1}
         minScale={1}
         maxScale={1}
-        // onInit={realignTransform}
+        onInit={realignTransform}
         ref={transformComponentRef}
       >
         <TransformComponent
           wrapperStyle={{
             width: '100%',
             height: '100%',
+            backgroundColor: '#41043922',
           }}
           contentStyle={{
-            width: '100%',
-            height: 'fit-content'
+            height: 'fit-content',
           }}
         >
           <Document

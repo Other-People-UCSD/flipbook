@@ -51,6 +51,13 @@ export default function PdfToolbarFooter({ numPages, pageNumber, setPageNumber, 
         <ZoomOutIcon />
       </IconButton>
 
+      <span>
+        <input type='number' name='zoom'
+          className={toolStyles.zoom__input}
+          defaultValue={parseInt(pageScale * 100, 10)}
+          value={parseInt(pageScale * 100, 10)} />
+      </span>
+
       <IconButton onClick={zoomIn} >
         <ZoomInIcon />
       </IconButton>

@@ -15,6 +15,9 @@ main {
 
 
 .layoutContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 19fr 1fr;
     background-color: #555;
 }
 
